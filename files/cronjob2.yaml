@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cron-mf-job-mondays
+spec:
+  # Every 10th minutes, on every Monday
+  schedule: "*/10 * * * 1"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: goodnight
+            image: busybox:1.28
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - sleep 30; echo "Hello, son of a gun!"
+          restartPolicy: Never

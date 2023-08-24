@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: foodie
+  name: foodie
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: foodie
+  template:
+    metadata:
+      labels:
+        app: foodie
+    spec:
+      containers:
+      - image: nginx
+        imagePullPolicy: Always
+        name: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: sotd-secret
+          mountPath: "/food/"
+          readOnly: true
+      volumes:
+      - name: sotd-secret
+        secret:
+          secretName: specialoftheday
+          optional: true
+status:

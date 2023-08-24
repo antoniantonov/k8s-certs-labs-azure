@@ -78,3 +78,54 @@ kubectl top pods
 ```
 
 How to configure metric-server for Kubernetes please follow this [example](./extras/configure-metric-server.md).
+
+## 10.
+```bash
+kubectl  create -f review5.yaml
+kubectl get pods
+```
+
+## 11.
+```bash
+kubectl get pods --show-labels
+kubectl get pods -l review=tux
+kubectl delete pods -l review=tux
+```
+
+## 12.
+Use the following [cronjob1.yaml](./files/cronjob1.yaml) file.
+```bash
+kubectl create -f cronjob.yaml
+kubectl get cronjobs
+
+# Wait for 3 minutes and then run the following command.
+kubectl get pods
+kubectl logs cron-mf-job-28214796-sm9nq 
+
+# After few minutes delete the cronjob
+kubectl delete cronjobs.batch cron-mf-job
+```
+For the rest of the exercise use the [cronjob2.yaml](./files/cronjob2.yaml) file. 
+
+## 13.
+```bash
+kubectl delete cronjobs.batch cron-mf-job
+kubectl delete cronjobs.batch cron-mf-job-mondays
+```
+
+## 14.
+Use the [secret1.yaml](./files/secret1.yaml) file. Keep in mind that for Opaque secrets the base64 encoding does not happen automatically. Then run the following commands:
+```bash
+kubectl create -f secret1.yaml
+kubectl get secrets
+kubectl get secret specialoftheday -o jsonpath="{.data.entree}" | base64 --decode
+```
+
+## 15.
+Use the [foodie.yaml)(./files/foodie.yaml) file. Then run the following commands:
+```bash
+kubectl create -f foodie.yaml
+```
+
+## 16.
+Use the [foodie.yaml](./files/foodie.yaml) file.
