@@ -128,4 +128,38 @@ kubectl create -f foodie.yaml
 ```
 
 ## 16.
-Use the [foodie.yaml](./files/foodie.yaml) file.
+Use the [foodie.yaml](./files/foodie.yaml) file. It has the secret mounted as a volume.
+
+## 17.
+```bash
+kubectl exec -it foodie -- /bin/bash
+root@foodie-79c5554b97-dlvvw:/ cat food/entree
+```
+
+## 18.
+Need to patch the deployment manifest to include the rolling update strategy. 
+```yaml
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    type: Recreate
+```
+And then update the image directly of the deployed container:
+```bash
+kubectl set image deploy foodie nginx=nginx:1.23.1-alpine
+kubectl get pod foodie-55cb84c84-cw2h4 -o yaml | grep image
+
+# Check the revision history
+kubectl rollout history deployment foodie
+```
+
+## 19.
+Rollback to revision 1:
+```bash
+kubectl rollout undo deployment foodie --to-revision=1
+kubectl get pod foodie-79c5554b97-22fhv -o yaml | grep image
+
+# Should have now revision 2 and 3 only.
+kubectl rollout history deployment foodie
+```
