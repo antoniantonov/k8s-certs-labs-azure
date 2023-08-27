@@ -163,3 +163,17 @@ kubectl get pod foodie-79c5554b97-22fhv -o yaml | grep image
 # Should have now revision 2 and 3 only.
 kubectl rollout history deployment foodie
 ```
+
+## 20.
+To install and configure NFS persistent volume refer to [configure-nfs-volume.md](./extras/configure-nfs-volume.md). Then use the [nfs-pv.yaml](./files/nfs-pv.yaml) file to create the persistent volume.
+```bash
+kubectl create -f nfs-pv.yaml
+kubectl get pv
+```
+
+## 21.
+Use the [nfs-pvc.yaml](./files/nfs-pvc.yaml) file to create the persistent volume claim.
+```bash
+kubectl create -f nfs-pvc.yaml
+kubectl get pvc
+```
