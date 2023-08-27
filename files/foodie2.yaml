@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: foodie2
+  name: foodie2
+  namespace: default
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: foodie2
+  template:
+    metadata:
+      labels:
+        app: foodie2
+    spec:
+      containers:
+      - image: nginx
+        imagePullPolicy: Always
+        name: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: sotd-secret
+          mountPath: "/food/"
+          readOnly: true
+        - name: reviewvol
+          mountPath: "/newvol"
+      volumes:
+      - name: sotd-secret
+        secret:
+          secretName: specialoftheday
+          optional: true
+      - name: reviewvol
+        persistentVolumeClaim:
+          claimName: reviewpvc
+status:

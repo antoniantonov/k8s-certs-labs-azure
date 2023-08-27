@@ -176,4 +176,46 @@ Use the [nfs-pvc.yaml](./files/nfs-pvc.yaml) file to create the persistent volum
 ```bash
 kubectl create -f nfs-pvc.yaml
 kubectl get pvc
+
+# This should bound the PVC to the PV
+# anton@k8s-cp:~$ kubectl get pvc
+# NAME        STATUS   VOLUME      CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+# reviewpvc   Bound    reviewvol   200Mi      RWX                           8h
+# anton@k8s-cp:~$ kubectl get pv
+# NAME        CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM               STORAGECLASS   REASON   AGE
+# reviewvol   200Mi      RWX            Recycle          Bound    default/reviewpvc                           8h
+# anton@k8s-cp:~$
+```
+
+## 22.
+Use the following [foodie2.yaml](./files/foodie2.yaml) file. It has the persistent volume claim mounted as a volume.
+```bash
+kubectl create -f foodie2.yaml
+
+# "-o wide" to ensure you have it running on worker node. Better test to show shared NFS volume.
+kubectl get pods -o wide
+# foodie2-7c87b7b897-d2ss4  1/1  Running  0  5m1s  10.244.2.36  k8s-worker
+```
+
+## 23.
+```bash
+kubectl exec -it foodie2-7f9f9f7f5f-8q9q5 -- /bin/bash
+
+root@foodie2-7f9f9f7f5f-8q9q5:/# df -h
+# Result:
+# ...
+# k8scp:/opt/sfw   29G  6.6G   23G  23% /newvol
+# ...
+root@foodie2-7f9f9f7f5f-8q9q5:/# ls -la /newvol/
+# Result: If you have followed the previous steps to setup NFS volume, you should see the following:
+# drwxrwxrwt 2 root root 4096 Aug 27 06:52 .
+# drwxr-xr-x 1 root root 4096 Aug 27 18:49 ..
+# -rw-r--r-- 1 root root    9 Aug 27 06:52 hello.txt     # <-- This is the file created on the CP node.
+```
+
+## 24.
+```bash
+kubectl delete -f foodie2.yaml
+kubectl delete -f nfs-pvc.yaml
+kubectl delete -f nfs-pv.yaml
 ```
