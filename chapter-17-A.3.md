@@ -219,3 +219,68 @@ kubectl delete -f foodie2.yaml
 kubectl delete -f nfs-pvc.yaml
 kubectl delete -f nfs-pv.yaml
 ```
+## 25.
+Use the [foodie3.yaml](./files/foodie3.yaml) file. 
+```bash
+kubectl create -f foodie3.yaml
+kubectl get pods -o wide
+```
+
+## 26.
+Use the [foodie3-loadbalancer.yaml](./files/foodie3-loadbalancer.yaml) file to deploy the load balancer service.
+Refer to [configure-ubuntu-nettools-pod.md](./extras/configure-ubuntu-nettools-pod.md) for more details on how to test exposed services.
+```bash
+kubectl create -f foodie3-loadbalancer.yaml
+kubectl describe svc foodie3-loadbalancer | grep IP:
+
+# Exec into the ubuntu container and run curl to the load balancer service on the IP returned from the previous command.
+kubectl exec -it ubuntu -- /bin/bash
+root@ubuntu:/# curl 10.110.225.202
+```
+
+## 27.
+TBD
+## 28.
+TBD 
+## 29.
+TBD
+
+## 30.
+Use the [review6.yaml](./files/review6.yaml) file.
+
+## 31.
+```bash
+kubectl create -f review6.yaml
+kubectl get pods -o wide
+kubectl logs securityreview 
+```
+
+Check the error:
+```
+......
+2023/08/31 13:32:44 [warn] 1#1: the "user" directive makes sense only if the master process runs with super-user privileges, ignored in /etc/nginx/nginx.conf:2
+nginx: [warn] the "user" directive makes sense only if the master process runs with super-user privileges, ignored in /etc/nginx/nginx.conf:2
+2023/08/31 13:32:44 [emerg] 1#1: mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)
+nginx: [emerg] mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)
+```
+
+Two possible solutions: <br>
+1. Use the unprevileged nginx image. More info [here](https://github.com/nginxinc/docker-nginx-unprivileged). Solution file is [review6-unprivileged.yaml](./files/review6-unprivileged.yaml).
+```yaml
+...
+  - name:  webguy
+    image: nginxinc/nginx-unprivileged
+    ports:
+    - containerPort: 8080
+...
+```
+And then check if we can reach the default page from out nettools pod.
+```bash
+kubectl get pods -o wide
+kubectl exec -it ubuntu -- /bin/bash
+
+# Note the default port for unpervileged nginx is 8080.
+root@ubuntu:/# curl 10.244.2.59:8080
+```
+
+2. Is the hard way - using privileged nginx image.
