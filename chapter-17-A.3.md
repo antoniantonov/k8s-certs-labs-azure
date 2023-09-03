@@ -250,11 +250,27 @@ Use the [review6.yaml](./files/review6.yaml) file.
 
 ## 31.
 ```bash
+kubectl get pod securityreview
+kubectl logs securityreview
+```
+## 32.
+```bash
+```bash
 kubectl create -f review6.yaml
 kubectl get pods -o wide
 kubectl logs securityreview 
 ```
 
+## 33.
+`Remarks: Cannot exec to non running container. So, first we need to fix it and then we can login to see the nginx UID.`
+```bash
+kubectl exec -it securityreview -- /bin/bash
+# Get the UID of the nginx user.
+root@securityreview:/ getent passwd | grep nginx
+
+# Result - 101.
+nginx:x:101:101:nginx user:/nonexistent:/bin/false
+```
 Check the error:
 ```
 ......
@@ -283,4 +299,130 @@ kubectl exec -it ubuntu -- /bin/bash
 root@ubuntu:/# curl 10.244.2.59:8080
 ```
 
-2. Is the hard way - using privileged nginx image.
+2. Is the hard way - using privileged nginx image. Some of the code is taken from this [SO article](https://stackoverflow.com/questions/63108119/how-to-run-an-nginx-container-as-non-root). Other parts I figured it out by trial and error :). The solution is to build a custom docker image from privileged nginx image. The solution is here: [./files/nginx-privileged/](./files/nginx-privileged/).
+```bash
+# Build the docker image.
+cd ./files/nginx-privileged/
+docker build -t yourcontainerrepo/nginx-priviledged:latest .
+docker push yourcontainerrepo/nginx-priviledged:latest
+
+# Deploy the pod with the following manifest file
+kubectl create -f ./files/nginx-privileged/review6-privileged.yaml
+kubectl get pods -o wide
+```
+
+## 34.
+This was covered pretty much by the previous exercise #33.
+
+## 35.
+Use the [securityaccount.yaml](./files/securityaccount.yaml) file. Then run the following commands:
+```bash
+kubectl create -f securityaccount.yaml
+kubectl get serviceaccounts
+kubectl describe serviceaccounts securityaccount
+```
+
+## 36.
+Use the following file [secrole.yaml](./files/secrole.yaml) to create the role. Then run the following commands:
+```bash
+kubectl create -f secrole.yaml
+kubectl get roles
+kubectl describe roles securityrole
+```
+
+## 37.
+The binding is part of the [secrole.yaml](./files/secrole.yaml) file. Creating the file in previous exercise will create the binding as well.
+
+## 38.
+There are two ways to create API token for the service account.
+```bash
+# This will create temporary token with expiry. 
+kubectl create token securityaccount --duration=600s
+```
+For the purpose of this exercise we will use the second method. Create a secret with the token and then use it in the pod. Use the file 
+```bash
+kubectl create -f securityaccountsecret.yaml 
+kubectl get secrets securityaccountsecret -o yaml
+
+# Result
+#apiVersion: v1
+#data:
+#  ca.crt: LS0tLS1C...
+#  namespace: ZGVmYXVsdA==
+#  token: ZXlKaG...          <-- This is the token.
+#kind: Secret
+#...
+```
+Create the file using vim
+```bash
+sudo vim /tmp/securitytoken
+```
+
+## 39.
+Remove what you want from your cluster. The way I understand it, it's about the security stuff we created the last 3-4 exercises.
+```bash
+kubectl delete -f securityaccount.yaml
+kubectl delete -f secrole.yaml
+kubectl delete -f securityaccountsecret.yaml
+```
+
+## 40. 
+Use the following file [webone.yaml](./files/webone.yaml) to create the deployment. Then run the following commands:
+```bash
+kubectl create -f webone.yaml
+kubectl get pods -o wide
+kubectl get svc webone-svc
+```
+
+## 41.
+The file [webone.yaml](./files/webone.yaml) has the service defined as NodePort. So, we can access it from outside the cluster. To do that we need to find out the port number. Then we can use the IP address of any node in the cluster to access the service. Make sure you add the NodePort port number to the allowed list in Azure VM or the NSG (Network Security Group) to which the CP node is attached. 
+```bash
+# Get the port number of the service.
+kubectl get svc webone-svc
+# Get the CP node IP address.
+curl ifconfig.io
+```
+
+## 42.
+Solved with the previous exercise.
+
+## 43.
+Patch the current service to change the type to ClusterIP. This will make the service accessible only from within the cluster.
+```bash
+kubectl patch svc webone-svc -p '{"spec": {"type": "ClusterIP"}}'
+```
+Check to make sure we cannot access the service from outside the cluster (try the same address and port from the web browser as in exercise #41). 
+Also, make sure we can access the nginx from the service inside the cluster.
+```bash
+kubectl get svc webone-svc -o yaml | grep clusterIP
+kubectl exec -it ubuntu -- /bin/bash
+# Use the IP obtained from the previous command.
+root@ubuntu:/# curl 10.108.52.55
+```
+
+## 44.
+Use the file [webtwo.yaml](./files/webtwo.yaml) to create the pod and service. Then run the following commands:
+```bash
+kubectl get svc webtwo-svc -o yaml | grep clusterIP
+kubectl exec -it ubuntu -- /bin/bash
+# Use the IP obtained from the previous command.
+root@ubuntu:/# curl 10.108.52.55
+```
+
+## 45.
+Try all these to make sure DNS works. Make sure you have deployed the pods to a different node than one where the ubuntu pod is deployed, in order to ensure networking is working as well. 
+```bash
+kubectl exec -it ubuntu -- /bin/bash
+root@ubuntu:/# nslookup webone-svc
+root@ubuntu:/# nslookup webone-svc.default
+root@ubuntu:/# nslookup webone-svc.default.svc.local
+root@ubuntu:/# nslookup webtwo-svc
+root@ubuntu:/# nslookup webtwo-svc.default
+root@ubuntu:/# nslookup webtwo-svc.default.svc.local
+root@ubuntu:/# curl webone-svc
+root@ubuntu:/# curl webone-svc.default
+root@ubuntu:/# curl webone-svc.default.svc.local
+root@ubuntu:/# curl webtwo-svc
+root@ubuntu:/# curl webtwo-svc.default
+root@ubuntu:/# curl webtwo-svc.default.svc.local
+```

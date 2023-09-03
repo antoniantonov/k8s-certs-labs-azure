@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webtwo
+  # Make sure this label corresponds to the selector of the service
+  labels:
+    app: webtwo
+spec:
+  containers:
+  - name:  website
+    image: wlniao/website
+    ports:
+    - containerPort: 80
+  nodeSelector: 
+    system: secondcp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webtwo-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: webtwo
+  ports:
+      # By default and for convenience, the `targetPort` is set to the same value as the `port` field.
+    - port: 80
+      targetPort: 80
