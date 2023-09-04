@@ -426,3 +426,41 @@ root@ubuntu:/# curl webtwo-svc
 root@ubuntu:/# curl webtwo-svc.default
 root@ubuntu:/# curl webtwo-svc.default.svc.local
 ```
+
+## 46.
+Install nginx ingress controller. Refer to [configure-nginx-ingress.md](./extras/configure-nginx-ingress.md) for more details. Then use the [ingress-web-one-two.yaml](./files/ingress-web-one-two.yaml) file to create the ingress resource. Then run the following commands:
+```bash
+kubectl create -f ingress-web-one-two.yaml
+
+# Get the IP of the ingress controller LoadBalancer service
+kubectl get svc myingress-ingress-nginx-controller
+
+# Check to see if both hosts work
+curl -H "Host: www.webone.com" http://10.99.156.107
+curl -H "Host: www.webtwo.com" http://10.99.156.107
+```
+
+## 47.
+```bash
+kubectl delete -f ingress-web-one-two.yaml
+kubectl delete -f webone.yaml
+kubectl delete -f webtwo.yaml
+
+# Delete ingress controller from your cluster if you'd like.
+helm uninstall myingress
+```
+
+## 48.
+TBD
+
+## 49.
+Will be using the [noscheduler-busybox.yaml](./files/noscheduler-busybox.yaml) file. Then run the following commands:
+```bash
+kubectl create -f noscheduler-busybox.yaml
+kubectl get pods -o wide
+# Make sure you see the pod running on the 3rd CP node.
+kubectl delete -f noscheduler-busybox.yaml
+```
+
+## 50.
+Ongoing. Please continue experimenting with the cluster.
