@@ -7,11 +7,11 @@ metadata:
     app: webone
 spec:
   containers:
-  - name:  nginx
+  - name: nginx
     image: nginx
     ports:
     - containerPort: 80
-  nodeSelector: 
+  nodeSelector:
     system: secondcp
 ---
 apiVersion: v1
@@ -23,6 +23,6 @@ spec:
   selector:
     app: webone
   ports:
-      # By default and for convenience, the `targetPort` is set to the same value as the `port` field.
-    - port: 80
-      targetPort: 80
+  # By default and for convenience, the `targetPort` is set to the same value as the `port` field.
+  - port: 80
+    targetPort: 80

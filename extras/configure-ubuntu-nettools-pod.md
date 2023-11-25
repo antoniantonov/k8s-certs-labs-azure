@@ -26,8 +26,7 @@ kubectl exec -it ubuntu -- /bin/bash
 4. Install net-tools
 ``` bash
 root@ubuntu:/
-    apt-get update ; apt-get install curl dnsutils -y
-    apt install iputils-ping
+    apt-get update ; apt-get install curl dnsutils -y; apt install iputils-ping;
 ```
 
 ## Testing 
