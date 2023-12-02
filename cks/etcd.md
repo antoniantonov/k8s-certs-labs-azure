@@ -2,7 +2,7 @@
 ETCD is the key-value store that stores the state of the Kubernetes cluster.
 
 # Enable ETCD encryption
-
+https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#write-an-encryption-configuration-file
 Create a key and EncryptionConfiguration
 ```bash
 mkdir -p /etc/kubernetes/etcd
@@ -10,6 +10,7 @@ echo -n this-is-very-sec | base64  # dGhpcy1pcy12ZXJ5LXNlYw==
 ```
 
 ```yaml
+# Located here: /etc/kubernetes/etcd/ec.yaml
 apiVersion: apiserver.config.k8s.io/v1
 kind: EncryptionConfiguration
 resources:
@@ -51,6 +52,7 @@ kubectl -n one get secrets -o json | kubectl replace -f -
 ```
 
 To check if the secret c1 under secrets namespace is encrypted at rest run the following:
+https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/#verifying-that-data-is-encrypted
 ```bash
 ETCDCTL_API=3 etcdctl --cert /etc/kubernetes/pki/apiserver-etcd-client.crt --key /etc/kubernetes/pki/apiserver-etcd-client.key --cacert /etc/kubernetes/pki/etcd/ca.crt get /registry/secrets/one/s1
 ```

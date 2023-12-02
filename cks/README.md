@@ -1,0 +1,1 @@
+These are some notes I took during my time studying for CKS. I hope you find them useful. Cheers!

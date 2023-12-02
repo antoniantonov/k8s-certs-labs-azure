@@ -4,6 +4,7 @@ gVisor is a user-space kernel, written in Go, that implements a substantial port
 # How to run a container with gVisor
 
 Create first a runtime class for gvisor
+https://kubernetes.io/docs/concepts/containers/runtime-class/#2-create-the-corresponding-runtimeclass-resources
 ```yaml
 apiVersion: node.k8s.io/v1
 kind: RuntimeClass

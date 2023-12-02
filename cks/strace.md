@@ -13,3 +13,9 @@ strace -p 19890 -f # use the PID of apiserver process
 # Run this for a little bit and then ctrl+c
 strace -p 19890 -f -cw # use your PID of apiserver process
 ```
+
+Check sys calls made by a process using strace
+```bash
+# 2>&1 -> Redirects the stderr to stdout (standard error to standard output)
+strace kill -9 1234 2>&1 | grep 1234
+```

@@ -2,7 +2,7 @@
 
 Admission controller web hooks are HTTP callbacks that receive admission requests and do something with them. You can define two types of admission web hooks, validating admission web hooks, and mutating admission web hooks.
 
-# Configuring admission controller
+# Configuring admission controller for scanning images
 ```bash
 # look up where the configuration file is stored
 cat /etc/kubernetes/manifests/kube-apiserver.yaml | grep admission-control-config-file
@@ -22,7 +22,8 @@ Enable ImagePolicyWebhook admission controller
 ```
 
 Admission controller configuration for ImagePolicyWebhook
-```yaml
+```json
+# /etc/kubernetes/policywebhook/admission_config.json
 {
    "apiVersion": "apiserver.config.k8s.io/v1",
    "kind": "AdmissionConfiguration",
@@ -70,4 +71,16 @@ users:
   user:
     client-certificate: /etc/kubernetes/policywebhook/apiserver-client-cert.pem     # cert for the webhook admission controller to use
     client-key:  /etc/kubernetes/policywebhook/apiserver-client-key.pem             # key matching the cert
+```
+
+# Configuring admission controller for Node restrictions
+```bash
+# Run as kubelet user from a node.
+export KUBECONFIG=/etc/kubernetes/kubelet.conf
+
+# Try label node other than the current - this should fail if running from a node other than the controlplane.
+kubectl label node controlplane node-role.kubernetes.io/master=master
+
+# This should fail even for its own node - special label.
+kubectl label node node1 node-restriction.kubernetes.io/abc=123
 ```
