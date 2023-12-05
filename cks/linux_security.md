@@ -24,6 +24,16 @@ kill 17773 # use your ID instead
 rm /usr/bin/app1
 ```
 
+# Find out process id (PID) using crictl for a given container
+```bash
+# get the container id -> 3bfd8f019282b
+crictl ps | grep apiserver
+
+# Run inspect and look for PID -> "pid": 31670
+crictl inspect --output go-template --template '{{.info.pid}}' 3bfd8f019282b
+crictl inspect 3bfd8f019282b | grep pid
+```
+
 # Binary hashes
 
 How to compare binary hashes?

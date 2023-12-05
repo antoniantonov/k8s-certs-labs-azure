@@ -10,7 +10,7 @@ ps aux | grep kube-apiserver
 # This will generate a lot of output
 strace -p 19890 -f # use the PID of apiserver process
 
-# Run this for a little bit and then ctrl+c
+# Run this for a little bit and then ctrl+c - counts the syscalls invocations.
 strace -p 19890 -f -cw # use your PID of apiserver process
 ```
 
