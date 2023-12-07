@@ -50,3 +50,31 @@ Nov 29 12:48:02 controlplane falco[40574]: Wed Nov 29 12:48:02 2023: Loading rul
 Nov 29 12:48:02 controlplane falco: Starting internal webserver, listening on port 8765
 Nov 29 12:48:02 controlplane falco[40574]: Wed Nov 29 12:48:02 2023: Starting internal webserver, listening on port 8765
 ```
+
+Verify if falco logs to syslog
+```bash
+service falco status
+# Look where the falco config is stored
+cd /etc/falco
+vim falco.yaml
+```
+```yaml
+# /etc/falco/falco.yaml
+
+...
+# Where security notifications should go.
+# Multiple outputs can be enabled.
+
+syslog_output:
+  enabled: true
+...
+```
+
+Find out the process that triggers errors/warnings
+```bash
+cat /var/log/syslog | grep falco | grep nginx | grep process
+# Sep 16 06:23:47 ubuntu2004 falco: 06:23:47.376241377: Error Package management process launched in container (user=root user_loginuid=-1 command=apk container_id=7a5ea6a080d1 container_name=nginx image=docker.io/library/nginx:1.19.2-alpine)
+
+crictl ps -id 7a5ea6a080d1
+crictl pods -id 7a864406b9794
+```

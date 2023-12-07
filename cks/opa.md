@@ -18,5 +18,6 @@ kubectl edit constrainttemplate blacklistimages
 kubectl get crd 
 requieredlabels.k8s.gatekeeper.sh       2021-10-17T20:28:00Z
 
+# To get the errors from constraints being enforced (in this case requiredlabels)
 kubectl describe requiredlabels namespace-mandatory-labels
 ```

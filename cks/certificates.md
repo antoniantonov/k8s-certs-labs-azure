@@ -70,3 +70,6 @@ echo "tlsMinVersion: VersionTLS13" | sudo tee -a /var/lib/kubelet/config.yaml
 sudo systemctl restart kubelet
 openssl s_client -connect 127.0.0.1:10250 -tls1_3
 ```
+
+Kubelet config should look like this:
+```yaml

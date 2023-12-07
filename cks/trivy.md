@@ -12,4 +12,7 @@ Static container scanner
 # Scan an image for given vulnerabilities
 trivy image nginx:1.19.1-alpine-perl | grep CVE-2021-28831
 trivy image nginx:1.19.1-alpine-perl | grep CVE-2016-9841
+
+# Search for either hit
+trivy image nginx:1.19.1-alpine-perl | grep -E "(CVE-2016-9841|CVE-2021-28831)"
 ```

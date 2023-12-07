@@ -20,6 +20,7 @@ apparmor_status
 
 # Enforce specific profile
 ```bash
+# -r => replace the profile already loaded.
 apparmor_parser -r /etc/apparmor.d/usr.bin.docker
 ```
 
